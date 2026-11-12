@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="uz" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KiberQalqon — Raqamli Dunyo Himoyachisi | CyberGuard UZ</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter & JetBrains Mono (terminal va kodlar uchun) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome ikonkalar -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        cyber: {
+                            dark: '#050811',
+                            card: '#0b1120',
+                            border: '#1e293b',
+                            cyan: '#00f0ff',
+                            green: '#00ff88',
+                            purple: '#7000ff',
+                            danger: '#ff2a55'
+                        }
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Asosiy fon va maxsus kiber-uslublar */
+        body {
+            background-color: #050811;
+            color: #e2e8f0;
+            overflow-x: hidden;
+        }
+
+        /* Neon yorug'lik effektlari */
+        .neon-border-cyan {
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.15);
+            border: 1px solid rgba(0, 240, 255, 0.3);
+        }
+        .neon-border-cyan:hover {
+            box-shadow: 0 0 25px rgba(0, 240, 255, 0.35);
+            border-color: rgba(0, 240, 255, 0.7);
+        }
+
+        .neon-border-green {
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.15);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+
+        .text-glow-cyan {
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+
+        .text-glow-green {
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        /* Glassmorphism kartochkalar */
+        .cyber-glass {
+            background: rgba(11, 17, 32, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        /* Terminal skrollbari */
+        .terminal-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+        .terminal-scroll::-webkit-scrollbar-track {
+            background: #050811;
+        }
+        .terminal-scroll::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 3px;
+        }
+        .terminal-scroll::-webkit-scrollbar-thumb:hover {
+            background: #00f0ff;
+        }
+
+        /* Grid foni */
+        .bg-cyber-grid {
+            background-image: 
+                linear-gradient(to right, rgba(0, 240, 255, 0.04) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 240, 255, 0.04) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+</head>
+<body class="bg-cyber-grid antialiased selection:bg-cyber-cyan selection:text-cyber-dark">
+
+    <!-- Orqa fondagi jonli tarmoq animatsiyasi (Canvas) -->
+    <canvas id="networkCanvas" class="fixed inset-0 w-full h-full pointer-events-none z-0 opacity-45"></canvas>
+
+    <!-- 1. ZAMONAVIY NAVIGATSIYA PANELI -->
+    <header class="fixed top-0 left-0 right-0 z-50 cyber-glass border-b border-slate-800/80 transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-20">
+                <!-- Logotip -->
+                <a href="#bosh-sahifa" class="flex items-center gap-3 group">
+                    <div class="relative w-10 h-10 rounded-xl bg-gradient-to-br from-cyber-cyan to-cyber-green p-[2px] transition-transform duration-300 group-hover:scale-105">
+                        <div class="w-full h-full bg-cyber-dark rounded-[10px] flex items-center justify-center">
+                            <i class="fa-solid fa-shield-halved text-cyber-cyan text-lg"></i>
+                        </div>
+                    </div>
+                    <div>
+                        <span class="font-extrabold text-xl tracking-tight text-white">Kiber<span class="text-cyber-cyan">Qalqon</span></span>
+                        <span class="block text-[10px] font-mono uppercase tracking-widest text-cyber-green">CyberGuard UZ</span>
+                    </div>
+                </a>
+
+                <!-- Desktop Menyu -->
+                <nav class="hidden lg:flex items-center gap-7 text-sm font-medium text-slate-300">
+                    <a href="#bosh-sahifa" class="hover:text-cyber-cyan transition-colors">Bosh sahifa</a>
+                    <a href="#xizmatlar" class="hover:text-cyber-cyan transition-colors">Xizmatlar</a>
+                    <a href="#tahdidlar-monitori" class="hover:text-cyber-cyan transition-colors flex items-center gap-1.5">
+                        <span class="w-2 h-2 rounded-full bg-cyber-green animate-ping"></span>
+                        Jonli statistika
+                    </a>
+                    <a href="#parol-tekshirgich" class="hover:text-cyber-cyan transition-colors">Parol tekshirgich</a>
+                    <a href="#bilimlar-bazasi" class="hover:text-cyber-cyan transition-colors">Bilimlar bazasi</a>
+                    <a href="#aloqa" class="hover:text-cyber-cyan transition-colors">Aloqa</a>
+                </nav>
+
+                <!-- Tezkor Audit Tugmasi + Mobil Menyu Tugmasi -->
+                <div class="flex items-center gap-3">
+                    <a href="#aloqa" class="hidden sm:inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-cyber-cyan/10 border border-cyber-cyan/40 text-cyber-cyan hover:bg-cyber-cyan hover:text-cyber-dark font-semibold text-sm transition-all duration-300">
+                        <i class="fa-solid fa-radar"></i>
+                        <span>Audit buyurtma</span>
+                    </a>
+                    <button id="mobileMenuBtn" aria-label="Menyuni ochish" class="lg:hidden p-2.5 rounded-xl bg-slate-900 border border-slate-700 text-slate-200 hover:text-cyber-cyan">
+                        <i class="fa-solid fa-bars text-lg"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobil Menyu -->
+        <div id="mobileMenu" class="hidden lg:hidden cyber-glass border-b border-slate-800 px-4 pt-2 pb-6 space-y-2">
+            <a href="#bosh-sahifa" class="mobile-link block px-4 py-3 rounded-xl text-slate-200 hover:bg-slate-800/70 hover:text-cyber-cyan">Bosh sahifa</a>
+            <a href="#xizmatlar" class="mobile-link block px-4 py-3 rounded-xl text-slate-200 hover:bg-slate-800/70 hover:text-cyber-cyan">Xizmatlar</a>
+            <a href="#tahdidlar-monitori" class="mobile-link block px-4 py-3 rounded-xl text-slate-200 hover:bg-slate-800/70 hover:text-cyber-cyan">Tahdidlar xaritasi / Jonli statistika</a>
+            <a href="#parol-tekshirgich" class="mobile-link block px-4 py-3 rounded-xl text-slate-200 hover:bg-slate-800/70 hover:text-cyber-cyan">Parol tekshirgich</a>
+            <a href="#bilimlar-bazasi" class="mobile-link block px-4 py-3 rounded-xl text-slate-200 hover:bg-slate-800/70 hover:text-cyber-cyan">Bilimlar bazasi</a>
+            <a href="#aloqa" class="mobile-link block px-4 py-3 rounded-xl bg-cyber-cyan text-cyber-dark font-semibold text-center mt-2">Aloqa va Audit</a>
+        </div>
+    </header>
+
+    <main class="relative z-10">
+
+        <!-- 2. HERO BO'LIMI -->
+        <section id="bosh-sahifa" class="pt-32 pb-20 lg:pt-40 lg:pb-28 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="grid lg:grid-cols-12 gap-12 items-center">
+                <!-- Chap ustun: Matn va tugmalar -->
+                <div class="lg:col-span-7 space-y-6 text-center lg:text-left">
+                    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-cyber-green/10 border border-cyber-green/30 text-cyber-green text-xs sm:text-sm font-mono">
+                        <span class="w-2 h-2 rounded-full bg-cyber-green animate-pulse"></span>
+                        <span>24/7 KIBER-HIMOYA TIZIMI FAOL</span>
+                    </div>
+
+                    <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-white leading-[1.15]">
+                        Raqamli Aktivlaringizni <br class="hidden sm:block">
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyber-cyan via-emerald-300 to-cyber-green text-glow-cyan">
+                            Kiber-Tahdidlardan
+                        </span>
+                        Ishonchli Himoyalang
+                    </h1>
+
+                    <p class="text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+                        Zamonaviy dunyoda ma'lumotlar — eng qimmatli boylik. <strong class="text-white">KiberQalqon</strong> biznesingiz, veb-ilovalaringiz va shaxsiy ma'lumotlaringizni xakerlik hujumlari, zararli dasturlar va ma'lumotlar sizib chiqishidan ilg'or texnologiyalar yordamida himoya qiladi.
+                    </p>
+
+                    <div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-2">
+                        <a href="#parol-tekshirgich" class="w-full sm:w-auto px-7 py-4 rounded-xl bg-gradient-to-r from-cyber-cyan to-cyber-green text-cyber-dark font-bold text-base shadow-lg shadow-cyber-cyan/25 hover:shadow-cyber-cyan/40 hover:scale-[1.02] transition-all flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-shield-virus"></i>
+                            <span>Xavfsizlikni tekshirish</span>
+                        </a>
+                        <a href="#xizmatlar" class="w-full sm:w-auto px-7 py-4 rounded-xl cyber-glass border border-slate-700 hover:border-cyber-cyan text-white font-semibold text-base transition-all flex items-center justify-center gap-2">
+                            <span>Batafsil ma'lumot</span>
+                            <i class="fa-solid fa-arrow-right text-cyber-cyan"></i>
+                        </a>
+                    </div>
+
+                    <!-- Qisqa ko'rsatkichlar -->
+                    <div class="grid grid-cols-3 gap-4 pt-6 border-t border-slate-800/80 max-w-lg mx-auto lg:mx-0">
+                        <div>
+                            <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono">99.9<span class="text-cyber-cyan">%</span></div>
+                            <div class="text-xs text-slate-400 mt-1">Tahdidlarni to'sish</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono">24<span class="text-cyber-green">/</span>7</div>
+                            <div class="text-xs text-slate-400 mt-1">Uzluksiz SOC monitoring</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl sm:text-3xl font-extrabold text-white font-mono">350<span class="text-cyber-cyan">+</span></div>
+                            <div class="text-xs text-slate-400 mt-1">Himoyalangan tizimlar</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- O'ng ustun: Kiber-qalqon vizual paneli -->
+                <div class="lg:col-span-5">
+                    <div class="relative cyber-glass rounded-3xl p-6 sm:p-8 neon-border-cyan animate-float">
+                        <div class="flex items-center justify-between pb-4 mb-6 border-b border-slate-800">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-rose-500"></span>
+                                <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                                <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+                            </div>
+                            <span class="text-xs font-mono text-cyber-cyan">SYSTEM_STATUS: PROTECTED</span>
+                        </div>
+
+                        <div class="flex flex-col items-center text-center py-4">
+                            <div class="relative w-28 h-28 rounded-full bg-cyber-cyan/10 border border-cyber-cyan/40 flex items-center justify-center mb-5">
+                                <div class="absolute inset-0 rounded-full border-2 border-dashed border-cyber-green/40 animate-spin" style="animation-duration: 14s;"></div>
+                                <i class="fa-solid fa-fingerprint text-5xl text-cyber-cyan"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-white">Ko'p Qatlamli Kiber-Himoya</h3>
+                            <p class="text-xs text-slate-400 mt-1 max-w-xs">Zero-Trust arxitekturasi va sun'iy intellektga asoslangan xavfni aniqlash tizimi</p>
+                        </div>
+
+                        <div class="space-y-3 mt-4 font-mono text-xs">
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/90 border border-slate-800">
+                                <span class="text-slate-300"><i class="fa-solid fa-lock text-cyber-green mr-2"></i>AES-256 Shifrlash</span>
+                                <span class="text-cyber-green font-semibold">FAOL</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/90 border border-slate-800">
+                                <span class="text-slate-300"><i class="fa-solid fa-network-wired text-cyber-cyan mr-2"></i>DDoS Qalqoni</span>
+                                <span class="text-cyber-cyan font-semibold">TAYYOR</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 rounded-xl bg-slate-900/90 border border-slate-800">
+                                <span class="text-slate-300"><i class="fa-solid fa-bug-slash text-emerald-400 mr-2"></i>Zaifliklar skaneri</span>
+                                <span class="text-emerald-400 font-semibold">0 XAVF</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. ASOSIY XIZMATLAR (SERVICES) -->
+        <section id="xizmatlar" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center max-w-3xl mx-auto mb-14">
+                <span class="text-xs font-mono uppercase tracking-widest text-cyber-cyan">Professional Yechimlar</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">Asosiy Kiberxavfsizlik Xizmatlari</h2>
+                <p class="text-slate-400 mt-3 text-sm sm:text-base">
+                    Infratuzilmangizning har bir qatlamini zamonaviy hujumlardan himoya qilish uchun kompleks yondashuv. Batafsil ma'lumot olish uchun kartochkani bosing.
+                </p>
+            </div>
+
+            <!-- 6 ta xizmat kartochkasi -->
+            <div id="servicesGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- JavaScript orqali dinamik ravishda to'ldiriladi -->
+            </div>
+        </section>
+
+        <!-- 4. INTERAKTIV VOSITALAR & JONLI STATISTIKA -->
+        <section id="tahdidlar-monitori" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center max-w-3xl mx-auto mb-14">
+                <span class="text-xs font-mono uppercase tracking-widest text-cyber-green">Interaktiv Laboratoriya</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">Jonli Tahdidlar Monitori va Xavfsizlik Vositalari</h2>
+                <p class="text-slate-400 mt-3 text-sm sm:text-base">
+                    Real vaqt rejimidagi kiber-hujumlar simulyatsiyasini kuzating, parolingiz mustahkamligini sinang va kiber-savodxonlik testidan o'ting.
+                </p>
+            </div>
+
+            <!-- 4.1 JONLI KIBER-HUJUMLAR MONITORI (LIVE THREAT FEED) -->
+            <div class="cyber-glass rounded-3xl p-6 sm:p-8 neon-border-green mb-12">
+                <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-6 border-b border-slate-800">
+                    <div>
+                        <div class="flex items-center gap-2.5">
+                            <span class="w-3 h-3 rounded-full bg-cyber-green animate-ping"></span>
+                            <h3 class="text-xl sm:text-2xl font-bold text-white">Jonli Kiber-Tahdidlar Markazi (SOC Terminal)</h3>
+                        </div>
+                        <p class="text-xs sm:text-sm text-slate-400 mt-1">Global va mahalliy tarmoqlarda aniqlanayotgan simulyatsiya qilingan hujumlar oqimi</p>
+                    </div>
+
+                    <!-- Jonli hisoblagichlar -->
+                    <div class="grid grid-cols-3 gap-3 sm:gap-4">
+                        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl px-4 py-2.5 text-center">
+                            <div class="text-[11px] font-mono text-slate-400">BLOKLANGAN</div>
+                            <div id="blockedCount" class="text-lg sm:text-xl font-extrabold font-mono text-cyber-green">14,892</div>
+                        </div>
+                        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl px-4 py-2.5 text-center">
+                            <div class="text-[11px] font-mono text-slate-400">DDoS / MALWARE</div>
+                            <div id="activeThreatsCount" class="text-lg sm:text-xl font-extrabold font-mono text-cyber-cyan">318</div>
+                        </div>
+                        <div class="bg-slate-900/90 border border-slate-800 rounded-2xl px-4 py-2.5 text-center">
+                            <div class="text-[11px] font-mono text-slate-400">HIMOYA DARAJASI</div>
+                            <div class="text-lg sm:text-xl font-extrabold font-mono text-emerald-400">MAKSIMAL</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Terminal log oynasi -->
+                <div class="mt-6 bg-[#03050a] rounded-2xl border border-slate-800/90 p-4 font-mono text-xs sm:text-sm">
+                    <div class="flex items-center justify-between text-slate-500 pb-3 mb-3 border-b border-slate-900">
+                        <span>root@kiberqalqon-soc:~# tail -f /var/log/threat_shield.log</span>
+                        <button id="toggleFeedBtn" class="px-3 py-1 rounded-lg bg-slate-900 text-cyber-cyan hover:bg-slate-800 text-xs transition">
+                            <i class="fa-solid fa-pause mr-1"></i> Pauza
+                        </button>
+                    </div>
+                    <div id="threatTerminal" class="h-64 overflow-y-auto terminal-scroll space-y-2 pr-1">
+                        <!-- Jonli loglar JS orqali qo'shiladi -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4.2 PAROL TEKSHIRGICH VA 4.3 KIBER-SAVODXONLIK TESTI -->
+            <div id="parol-tekshirgich" class="grid lg:grid-cols-2 gap-8">
+                
+                <!-- PAROL MUSTAHKAMLIGINI TEKSHIRUVCHI VOSITA -->
+                <div class="cyber-glass rounded-3xl p-6 sm:p-8 neon-border-cyan flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-11 h-11 rounded-2xl bg-cyber-cyan/15 border border-cyber-cyan/30 flex items-center justify-center text-cyber-cyan">
+                                <i class="fa-solid fa-key text-xl"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white">Parol Mustahkamligini Tekshirgich</h3>
+                                <p class="text-xs text-slate-400">Parolingiz xakerlar hujumiga qanchalik bardoshli?</p>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-400 mb-4 bg-slate-900/70 p-3 rounded-xl border border-slate-800">
+                            <i class="fa-solid fa-shield-check text-cyber-green mr-1.5"></i>
+                            Maxfiylik kafolatlangan: kiritilgan parol serverga yuborilmaydi, barcha tahlil faqat sizning brauzeringizda bajariladi.
+                        </p>
+
+                        <!-- Parol kiritish maydoni -->
+                        <div class="relative mb-5">
+                            <input 
+                                type="password" 
+                                id="passwordInput" 
+                                placeholder="Tekshirish uchun parol kiriting..." 
+                                class="w-full bg-slate-950/90 border border-slate-700 focus:border-cyber-cyan focus:outline-none rounded-xl px-4 py-3.5 pr-24 text-white font-mono text-sm placeholder-slate-500"
+                            >
+                            <div class="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1">
+                                <button type="button" id="generatePassBtn" title="Kuchli parol yaratish" class="p-2 rounded-lg text-slate-400 hover:text-cyber-green hover:bg-slate-800 transition">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                </button>
+                                <button type="button" id="togglePassVisibility" title="Ko'rsatish/Yashirish" class="p-2 rounded-lg text-slate-400 hover:text-cyber-cyan hover:bg-slate-800 transition">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Kuch foizi va progress bar -->
+                        <div class="mb-5">
+                            <div class="flex items-center justify-between text-sm mb-2">
+                                <span class="text-slate-300 font-medium">Mustahkamlik darajasi: <strong id="strengthLabel" class="text-slate-400">Kiritilmagan</strong></span>
+                                <span id="strengthPercent" class="font-mono font-bold text-cyber-cyan">0%</span>
+                            </div>
+                            <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden p-0.5 border border-slate-800">
+                                <div id="strengthBar" class="h-full w-0 rounded-full bg-slate-600 transition-all duration-300"></div>
+                            </div>
+                        </div>
+
+                        <!-- Buzish uchun ketadigan taxminiy vaqt -->
+                        <div class="p-4 rounded-2xl bg-slate-900/90 border border-slate-800 mb-5 flex items-center justify-between">
+                            <div>
+                                <div class="text-xs text-slate-400">Brute-force orqali buzish vaqti:</div>
+                                <div id="crackTime" class="text-base sm:text-lg font-bold font-mono text-white mt-0.5">—</div>
+                            </div>
+                            <i class="fa-solid fa-stopwatch text-2xl text-cyber-cyan/70"></i>
+                        </div>
+
+                        <!-- Tavsiyalar ro'yxati -->
+                        <div class="space-y-2 text-xs sm:text-sm">
+                            <div id="reqLength" class="flex items-center gap-2 text-slate-400">
+                                <i class="fa-regular fa-circle-xmark text-rose-500"></i>
+                                <span>Kamida 12 ta belgidan iborat bo'lsin</span>
+                            </div>
+                            <div id="reqUpper" class="flex items-center gap-2 text-slate-400">
+                                <i class="fa-regular fa-circle-xmark text-rose-500"></i>
+                                <span>Katta va kichik lotin harflari (A-Z, a-z)</span>
+                            </div>
+                            <div id="reqNumber" class="flex items-center gap-2 text-slate-400">
+                                <i class="fa-regular fa-circle-xmark text-rose-500"></i>
+                                <span>Kamida bitta raqam (0-9) qatnashsin</span>
+                            </div>
+                            <div id="reqSpecial" class="flex items-center gap-2 text-slate-400">
+                                <i class="fa-regular fa-circle-xmark text-rose-500"></i>
+                                <span>Maxsus belgilar (!@#$%^&*) ishlatilsin</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="passwordAdviceBox" class="mt-5 pt-4 border-t border-slate-800 text-xs text-slate-400">
+                        Maslahat: Shaxsiy ismingiz, tug'ilgan sanangiz yoki "123456" kabi oddiy ketma-ketliklardan foydalanmang.
+                    </div>
+                </div>
+
+                <!-- KIBERXAVFSIZLIK BO'YICHA TEZKOR TEST (SECURITY QUIZ) -->
+                <div class="cyber-glass rounded-3xl p-6 sm:p-8 neon-border-green flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-5">
+                            <div class="flex items-center gap-3">
+                                <div class="w-11 h-11 rounded-2xl bg-cyber-green/15 border border-cyber-green/30 flex items-center justify-center text-cyber-green">
+                                    <i class="fa-solid fa-brain text-xl"></i>
+                                </div>
+                                <div>
+                                    <h3 class="text-xl font-bold text-white">Kiber-Savodxonlik Testi</h3>
+                                    <p class="text-xs text-slate-400">5 ta savol orqali bilimingizni sinang</p>
+                                </div>
+                            </div>
+                            <span id="quizStepBadge" class="px-3 py-1 rounded-full bg-slate-900 border border-slate-700 font-mono text-xs text-cyber-green">
+                                1 / 5
+                            </span>
+                        </div>
+
+                        <!-- Savol konteyneri -->
+                        <div id="quizContainer">
+                            <h4 id="quizQuestion" class="text-base sm:text-lg font-semibold text-white mb-4 leading-snug">
+                                Savol yuklanmoqda...
+                            </h4>
+                            <div id="quizOptions" class="space-y-3">
+                                <!-- Variantlar JS orqali chiqadi -->
+                            </div>
+                        </div>
+
+                        <!-- Natija konteyneri (boshida yashirin) -->
+                        <div id="quizResultContainer" class="hidden text-center py-4">
+                            <div class="w-20 h-20 rounded-full bg-cyber-green/15 border border-cyber-green/40 flex items-center justify-center mx-auto mb-4">
+                                <span id="quizScoreText" class="text-2xl font-extrabold font-mono text-cyber-green">0/5</span>
+                            </div>
+                            <h4 id="quizResultTitle" class="text-xl font-bold text-white mb-2">Natija</h4>
+                            <p id="quizResultAdvice" class="text-sm text-slate-300 leading-relaxed mb-6"></p>
+                            <button id="restartQuizBtn" class="px-6 py-3 rounded-xl bg-cyber-green text-cyber-dark font-bold text-sm hover:opacity-90 transition">
+                                <i class="fa-solid fa-rotate-right mr-1.5"></i> Testni qayta topshirish
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="quizFooter" class="mt-6 pt-4 border-t border-slate-800 flex items-center justify-between">
+                        <span id="quizFeedback" class="text-xs text-slate-400">To'g'ri javobni tanlang</span>
+                        <button id="nextQuizBtn" disabled class="px-5 py-2.5 rounded-xl bg-cyber-cyan text-cyber-dark font-bold text-xs sm:text-sm disabled:opacity-40 disabled:cursor-not-allowed transition">
+                            Keyingi savol <i class="fa-solid fa-arrow-right ml-1"></i>
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- 5. KIBERXAVFSIZLIK BO'YICHA MASLAHATLAR VA BILIMLAR BAZASI -->
+        <section id="bilimlar-bazasi" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="text-center max-w-3xl mx-auto mb-14">
+                <span class="text-xs font-mono uppercase tracking-widest text-cyber-cyan">Bilimlar Bazasi</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-2">Asosiy Kiber-Tahdidlar va Himoya Qoidalari</h2>
+                <p class="text-slate-400 mt-3 text-sm sm:text-base">
+                    Eng ko'p uchraydigan hujum turlari haqida xabardor bo'ling va o'zingizni hamda jamoangizni himoya qilishni o'rganing.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <!-- Maqola 1: Phishing -->
+                <article class="cyber-glass rounded-3xl overflow-hidden border border-slate-800 hover:border-cyber-cyan/60 transition-all duration-300 flex flex-col justify-between group">
+                    <div class="p-6 sm:p-7">
+                        <div class="flex items-center justify-between mb-5">
+                            <span class="px-3 py-1 rounded-lg bg-rose-500/15 text-rose-400 font-mono text-xs border border-rose-500/30">IJTIMOIY MUHANDISLIK</span>
+                            <i class="fa-solid fa-fish-fins text-2xl text-rose-400 group-hover:scale-110 transition-transform"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Phishing (Fishing) Hujumlari Qanday Ishlaydi?</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                            Firibgarlar bank, davlat xizmatlari yoki mashhur platformalar nomidan soxta xabar va havolalar yuborib, login, parol hamda plastik karta ma'lumotlaringizni qo'lga kiritishga urinadi.
+                        </p>
+                        <ul class="space-y-2 text-xs text-slate-400 border-t border-slate-800 pt-4">
+                            <li><i class="fa-solid fa-check text-cyber-green mr-2"></i>Domen manzilini harfma-harf tekshiring</li>
+                            <li><i class="fa-solid fa-check text-cyber-green mr-2"></i>Shubhali fayl va havolalarni ochmang</li>
+                            <li><i class="fa-solid fa-check text-cyber-green mr-2"></i>SMS orqali kelgan bir martalik kodni hech kimga bermang</li>
+                        </ul>
+                    </div>
+                    <div class="px-6 py-4 bg-slate-900/60 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                        <span>O'qish vaqti: 3 daqiqa</span>
+                        <span class="text-cyber-cyan font-semibold">Xavf darajasi: Yuqori</span>
+                    </div>
+                </article>
+
+                <!-- Maqola 2: Ransomware -->
+                <article class="cyber-glass rounded-3xl overflow-hidden border border-slate-800 hover:border-cyber-cyan/60 transition-all duration-300 flex flex-col justify-between group">
+                    <div class="p-6 sm:p-7">
+                        <div class="flex items-center justify-between mb-5">
+                            <span class="px-3 py-1 rounded-lg bg-amber-500/15 text-amber-400 font-mono text-xs border border-amber-500/30">ZARARLI DASTUR</span>
+                            <i class="fa-solid fa-file-shield text-2xl text-amber-400 group-hover:scale-110 transition-transform"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Ransomware — Tovlamachi Viruslardan Himoya</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                            Ransomware kompyuter yoki serverdagi barcha muhim fayllarni shifrlab qo'yadi va ularni ochish evaziga kriptovalyutada katta miqdorda to'lov talab qiladi.
+                        </p>
+                        <ul class="space-y-2 text-xs text-slate-400 border-t border-slate-800 pt-4">
+                            <li><i class="fa-solid fa-check text-cyber-green mr-2"></i>3-2-1 qoidasi asosida zaxira nusxa (Backup) oling</li>
+                            <li><i class="fa-solid fa-check text-cyber-green mr-2"></i>Operatsion tizim va dasturlarni muntazam yangilang</li>
+                            <li><i class="fa-solid fa-check text-cyber-green mr-2"></i>Litsenziyasiz (pirat) dasturlarni o'rnatmang</li>
+                        </ul>
+                    </div>
+                    <div class="px-6 py-4 bg-slate-900/60 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                        <span>O'qish vaqti: 4 daqiqa</span>
+                        <span class="text-amber-400 font-semibold">Xavf darajasi: Kritik</span>
+                    </div>
+                </article>
+
+                <!-- Maqola 3: 2FA -->
+                <article class="cyber-glass rounded-3xl overflow-hidden border border-slate-800 hover:border-cyber-green/60 transition-all duration-300 flex flex-col justify-between group">
+                    <div class="p-6 sm:p-7">
+                        <div class="flex items-center justify-between mb-5">
+                            <span class="px-3 py-1 rounded-lg bg-cyber-green/15 text-cyber-green font-mono text-xs border border-cyber-green/30">HIMOYA STANDARTI</span>
+                            <i class="fa-solid fa-mobile-screen-button text-2xl text-cyber-green group-hover:scale-110 transition-transform"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-3">Ikki Bosqichli Autentifikatsiya (2FA) Nega Shart?</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed mb-4">
+                            Parolingiz o'g'irlangan taqdirda ham, 2FA (Google Authenticator, apparat kalitlari yoki biometrika) xakerning hisobingizga kirishini 99.9% holatda to'xtatib qoladi.
+                        </p>
+                        <ul class="space-y-2 text-xs text-slate-400 border-t border-slate-800 pt-4">
+                            <li><i class="fa-solid fa-check text-cyber-green mr-2"></i>SMS o'rniga Authenticator ilovalaridan foydalaning</li>
+                            <li><i class="fa-solid fa-check text-cyber-green mr-2"></i>Zaxira tiklash kodlarini xavfsiz joyda saqlang</li>
+                            <li><i class="fa-solid fa-check text-cyber-green mr-2"></i>Barcha elektron pochta va ijtimoiy tarmoqlarda yoqing</li>
+                        </ul>
+                    </div>
+                    <div class="px-6 py-4 bg-slate-900/60 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                        <span>O'qish vaqti: 2 daqiqa</span>
+                        <span class="text-cyber-green font-semibold">Tavsiya: Majburiy</span>
+                    </div>
+                </article>
+            </div>
+        </section>
+
+        <!-- 6. BOG'LANISH VA KIBER-AUDIT SO'RASH FORMASI -->
+        <section id="aloqa" class="py-20 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+            <div class="cyber-glass rounded-3xl p-6 sm:p-10 lg:p-12 neon-border-cyan">
+                <div class="grid lg:grid-cols-12 gap-10 items-start">
+                    
+                    <!-- Chap tomon: Ma'lumotlar -->
+                    <div class="lg:col-span-5 space-y-6">
+                        <span class="text-xs font-mono uppercase tracking-widest text-cyber-cyan">Xavfsizlik Auditi</span>
+                        <h2 class="text-3xl sm:text-4xl font-extrabold text-white leading-tight">
+                            Tizimingizni Xakerlardan Oldin Tekshiring
+                        </h2>
+                        <p class="text-slate-300 text-sm sm:text-base leading-relaxed">
+                            Kompaniyangiz veb-sayti, mobil ilovasi yoki ichki tarmog'ida zaifliklar bor-yo'qligini aniqlash uchun professional kiber-audit buyurtma qiling. Mutaxassislarimiz 24 soat ichida siz bilan bog'lanishadi.
+                        </p>
+
+                        <div class="space-y-4 pt-2">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-cyber-cyan/10 border border-cyber-cyan/30 flex items-center justify-center text-cyber-cyan shrink-0">
+                                    <i class="fa-solid fa-location-dot"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-semibold text-white">Manzil</div>
+                                    <div class="text-xs text-slate-400">Toshkent shahri, IT Park majmuasi, Kiberxavfsizlik markazi</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-cyber-green/10 border border-cyber-green/30 flex items-center justify-center text-cyber-green shrink-0">
+                                    <i class="fa-solid fa-envelope"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-semibold text-white">Elektron pochta (PGP qo'llab-quvvatlanadi)</div>
+                                    <div class="text-xs text-slate-400 font-mono">audit@kiberqalqon.uz</div>
+                                </div>
+                            </div>
+
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-cyber-cyan/10 border border-cyber-cyan/30 flex items-center justify-center text-cyber-cyan shrink-0">
+                                    <i class="fa-solid fa-headset"></i>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-semibold text-white">Tezkor Kiber-Yordam (CERT)</div>
+                                    <div class="text-xs text-slate-400 font-mono">+998 (71) 200-99-11</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- O'ng tomon: Ishlaydigan forma -->
+                    <div class="lg:col-span-7 bg-slate-950/80 border border-slate-800 rounded-2xl p-6 sm:p-8">
+                        <form id="auditForm" class="space-y-5">
+                            <div class="grid sm:grid-cols-2 gap-5">
+                                <div>
+                                    <label for="fullName" class="block text-xs font-medium text-slate-300 mb-2">Ism va familiyangiz *</label>
+                                    <input type="text" id="fullName" required placeholder="Masalan: Azizbek Karimov" class="w-full bg-slate-900 border border-slate-700 focus:border-cyber-cyan focus:outline-none rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500">
+                                </div>
+                                <div>
+                                    <label for="companyOrSite" class="block text-xs font-medium text-slate-300 mb-2">Kompaniya yoki veb-sayt manzili *</label>
+                                    <input type="text" id="companyOrSite" required placeholder="https://sizning-sayt.uz" class="w-full bg-slate-900 border border-slate-700 focus:border-cyber-cyan focus:outline-none rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 font-mono">
+                                </div>
+                            </div>
+
+                            <div class="grid sm:grid-cols-2 gap-5">
+                                <div>
+                                    <label for="contactPhone" class="block text-xs font-medium text-slate-300 mb-2">Telefon raqamingiz *</label>
+                                    <input type="tel" id="contactPhone" required placeholder="+998 90 123 45 67" class="w-full bg-slate-900 border border-slate-700 focus:border-cyber-cyan focus:outline-none rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500 font-mono">
+                                </div>
+                                <div>
+                                    <label for="serviceType" class="block text-xs font-medium text-slate-300 mb-2">Kerakli xizmat turi</label>
+                                    <select id="serviceType" class="w-full bg-slate-900 border border-slate-700 focus:border-cyber-cyan focus:outline-none rounded-xl px-4 py-3 text-sm text-white">
+                                        <option value="Penetratsion test (Pentesting)">Penetratsion test (Pentesting)</option>
+                                        <option value="To'liq kiber-audit">To'liq kiber-audit</option>
+                                        <option value="Tarmoq va DDoS himoyasi">Tarmoq va DDoS himoyasi</option>
+                                        <option value="Bulutli infratuzilma xavfsizligi">Bulutli infratuzilma xavfsizligi</option>
+                                        <option value="Xodimlarni kiber-savodxonlikka o'qitish">Xodimlarni o'qitish</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label for="auditMessage" class="block text-xs font-medium text-slate-300 mb-2">Qo'shimcha izoh yoki talablar</label>
+                                <textarea id="auditMessage" rows="3" placeholder="Tizimingiz haqida qisqacha ma'lumot qoldiring..." class="w-full bg-slate-900 border border-slate-700 focus:border-cyber-cyan focus:outline-none rounded-xl px-4 py-3 text-sm text-white placeholder-slate-500"></textarea>
+                            </div>
+
+                            <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-cyber-cyan to-cyber-green text-cyber-dark font-bold text-sm sm:text-base shadow-lg shadow-cyber-cyan/20 hover:opacity-95 transition flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-paper-plane"></i>
+                                <span>Xavfsizlik Auditi Buyurtma Qilish</span>
+                            </button>
+                        </form>
+
+                        <!-- Tasdiqlash xabari (yuborilgandan keyin chiqadi) -->
+                        <div id="auditSuccessBox" class="hidden text-center py-8 space-y-4">
+                            <div class="w-16 h-16 rounded-full bg-cyber-green/15 border border-cyber-green/40 flex items-center justify-center mx-auto text-cyber-green text-3xl">
+                                <i class="fa-solid fa-circle-check"></i>
+                            </div>
+                            <h3 class="text-2xl font-bold text-white">So'rovingiz Muvaffaqiyatli Qabul Qilindi!</h3>
+                            <p id="auditConfirmationText" class="text-sm text-slate-300 max-w-md mx-auto leading-relaxed"></p>
+                            <div class="inline-block px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 font-mono text-xs text-cyber-cyan">
+                                Ariza raqami: <span id="ticketNumber">#KQ-8492</span>
+                            </div>
+                            <div class="pt-2">
+                                <button id="newRequestBtn" class="px-5 py-2.5 rounded-xl border border-slate-700 text-xs text-slate-300 hover:text-white hover:border-cyber-cyan transition">
+                                    Yangi so'rov yuborish
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="relative z-10 border-t border-slate-800/80 bg-[#03050c] py-10 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+            <div class="flex items-center gap-2.5">
+                <i class="fa-solid fa-shield-halved text-cyber-cyan text-base"></i>
+                <span class="font-bold text-white text-sm">KiberQalqon (CyberGuard UZ)</span>
+                <span>— Raqamli xavfsizlik platformasi</span>
+            </div>
+            <div class="font-mono text-slate-500">
+                &copy; 2026 KiberQalqon. Barcha huquqlar himoyalangan.
+            </div>
+        </div>
+    </footer>
+
+    <!-- XIZMATLAR UCHUN BATAFSIL MODAL OYNA -->
+    <div id="serviceModal" class="fixed inset-0 z-50 hidden items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+        <div class="cyber-glass border border-cyber-cyan/50 rounded-3xl max-w-lg w-full p-6 sm:p-8 relative shadow-2xl shadow-cyber-cyan/20">
+            <button id="closeModalBtn" aria-label="Yopish" class="absolute top-5 right-5 w-9 h-9 rounded-xl bg-slate-900 border border-slate-700 text-slate-400 hover:text-white flex items-center justify-center">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            <div id="modalIcon" class="w-14 h-14 rounded-2xl bg-cyber-cyan/15 border border-cyber-cyan/30 flex items-center justify-center text-cyber-cyan text-2xl mb-5"></div>
+            <h3 id="modalTitle" class="text-2xl font-bold text-white mb-2"></h3>
+            <p id="modalDesc" class="text-sm text-slate-300 leading-relaxed mb-5"></p>
+            <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-4 mb-6">
+                <div class="text-xs font-mono text-cyber-green uppercase mb-2.5">Xizmat tarkibiga kiradi:</div>
+                <ul id="modalFeatures" class="space-y-2 text-xs sm:text-sm text-slate-300"></ul>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <a href="#aloqa" id="modalOrderBtn" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-cyber-cyan to-cyber-green text-cyber-dark font-bold text-sm text-center">
+                    Ushbu xizmatni buyurtma qilish
+                </a>
+                <button id="modalCancelBtn" class="px-5 py-3 rounded-xl border border-slate-700 text-slate-300 hover:text-white text-sm">
+                    Yopish
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JAVASCRIPT MANTIQI -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // ==========================================
+            // 1. MOBIL MENYU BOSHQARUVI
+            // ==========================================
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const mobileMenu = document.getElementById('mobileMenu');
+            const mobileLinks = document.querySelectorAll('.mobile-link');
+
+            mobileMenuBtn.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+            mobileLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    mobileMenu.classList.add('hidden');
+                });
+            });
+
+            // ==========================================
+            // 2. XIZMATLAR KARTOCHKALARI VA MODAL OYNA
+            // ==========================================
+            const servicesData = [
+                {
+                    title: "Tarmoq Xavfsizligi",
+                    icon: "fa-network-wired",
+                    color: "cyan",
+                    shortDesc: "Korporativ tarmoqlarni ruxsatsiz kirishlar, DDoS hujumlar va trafikni tinglashdan himoyalash.",
+                    fullDesc: "Zamonaviy Firewall (NGFW), IDS/IPS tizimlari va VPN shlyuzlarini sozlash orqali kompaniyangiz ichki va tashqi tarmoqlarini to'liq nazorat ostiga olamiz.",
+                    features: [
+                        "Yangi avlod Firewall (NGFW) arxitekturasini joriy etish",
+                        "DDoS hujumlarni avtomatik filtrlash va bloklash",
+                        "Tarmoq segmentatsiyasi va Zero-Trust nazorati",
+                        "24/7 tarmoq trafigi anomaliyalarini kuzatish"
+                    ]
+                },
+                {
+                    title: "Penetratsion Test (Pentesting)",
+                    icon: "fa-user-secret",
+                    color: "green",
+                    shortDesc: "Axloqiy xakerlar (Ethical Hackers) yordamida tizimingizdagi zaifliklarni hujumchilardan oldin topish.",
+                    fullDesc: "Veb-saytlar, mobil ilovalar va API interfeyslaringizga real kiber-hujum ssenariylari asosida sinov o'tkazamiz va har bir zaiflikni bartaraf etish yo'riqnomasini taqdim etamiz.",
+                    features: [
+                        "OWASP Top 10 standartlari bo'yicha chuqur tahlil",
+                        "Veb, mobil va ichki infratuzilma pentesti",
+                        "Batafsil texnik hisobot va xavf darajasi bahosi",
+                        "Kamchiliklar tuzatilgandan so'ng qayta tekshiruv"
+                    ]
+                },
+                {
+                    title: "Bulutli Xavfsizlik",
+                    icon: "fa-cloud-bolt",
+                    color: "cyan",
+                    shortDesc: "AWS, Azure, Google Cloud va mahalliy bulut serverlardagi ma'lumotlar xavfsizligini ta'minlash.",
+                    fullDesc: "Bulutli infratuzilmadagi noto'g'ri konfiguratsiyalar ma'lumotlar sizib chiqishining asosiy sababidir. Biz bulut muhitingizni xalqaro xavfsizlik standartlariga moslashtiramiz.",
+                    features: [
+                        "Bulutli serverlar va konteynerlar (Docker/K8s) himoyasi",
+                        "Kirish huquqlarini boshqarish (IAM) auditi",
+                        "Avtomatlashtirilgan zaxira nusxalash va tiklash",
+                        "Bulutli muhitda real vaqt monitoringi"
+                    ]
+                },
+                {
+                    title: "Ma'lumotlarni Shifrlash",
+                    icon: "fa-lock",
+                    color: "green",
+                    shortDesc: "Maxfiy hujjatlar, mijozlar bazasi va moliyaviy tranzaksiyalarni kriptografik himoyalash.",
+                    fullDesc: "Ma'lumotlar uzatilayotganda ham, serverlarda saqlanayotganda ham ularni o'qib bo'lmaydigan holatga keltiruvchi zamonaviy kriptografik yechimlarni tatbiq etamiz.",
+                    features: [
+                        "AES-256 va RSA algoritmlari asosida shifrlash",
+                        "Ma'lumotlar bazasi (TDE) va disk shifrlash",
+                        "SSL/TLS sertifikatlar va shifrlangan aloqa kanallari",
+                        "DLP (ma'lumotlar sizib chiqishini oldini olish) tizimi"
+                    ]
+                },
+                {
+                    title: "Kiber-Audit va Muvofiqlik",
+                    icon: "fa-clipboard-check",
+                    color: "cyan",
+                    shortDesc: "Axborot xavfsizligi holatini baholash va ISO 27001, PCI DSS standartlariga moslashtirish.",
+                    fullDesc: "Tashkilotingizning axborot xavfsizligi siyosati, texnik vositalari va biznes jarayonlarini kompleks tekshiruvdan o'tkazib, xavflarni kamaytirish rejasini tuzamiz.",
+                    features: [
+                        "ISO/IEC 27001 va PCI DSS standartlariga tayyorgarlik",
+                        "Ichki xavfsizlik siyosati va reglamentlarini ishlab chiqish",
+                        "Manba kodi (Source Code) xavfsizlik auditi",
+                        "Xavflarni boshqarish bo'yicha yo'l xaritasi"
+                    ]
+                },
+                {
+                    title: "Xodimlarni O'qitish",
+                    icon: "fa-graduation-cap",
+                    color: "green",
+                    shortDesc: "Jamoangizni phishing, ijtimoiy muhandislik va kiber-firibgarliklarni aniqlashga o'rgatish.",
+                    fullDesc: "Statistikaga ko'ra, kiber-hujumlarning 85 foizi inson omili tufayli muvaffaqiyatli amalga oshadi. Amaliy treninglar orqali xodimlaringizni kompaniyaning birinchi himoya chizig'iga aylantiramiz.",
+                    features: [
+                        "Simulyatsiya qilingan o'quv phishing hujumlari",
+                        "Amaliy kiber-gigiyena va parol boshqaruvi darslari",
+                        "Rahbarlar va IT mutaxassislar uchun maxsus kurslar",
+                        "Bilim darajasini baholash va sertifikatlash"
+                    ]
+                }
+            ];
+
+            const servicesGrid = document.getElementById('servicesGrid');
+            const serviceModal = document.getElementById('serviceModal');
+            const closeModalBtn = document.getElementById('closeModalBtn');
+            const modalCancelBtn = document.getElementById('modalCancelBtn');
+            const modalOrderBtn = document.getElementById('modalOrderBtn');
+
+            servicesData.forEach((service, index) => {
+                const isCyan = service.color === 'cyan';
+                const card = document.createElement('div');
+                card.className = `cyber-glass rounded-3xl p-6 sm:p-7 border border-slate-800 hover:border-${isCyan ? 'cyber-cyan' : 'cyber-green'}/60 transition-all duration-300 cursor-pointer group flex flex-col justify-between`;
+                card.innerHTML = `
+                    <div>
+                        <div class="w-12 h-12 rounded-2xl bg-${isCyan ? 'cyber-cyan' : 'cyber-green'}/15 border border-${isCyan ? 'cyber-cyan' : 'cyber-green'}/30 flex items-center justify-center text-${isCyan ? 'cyber-cyan' : 'cyber-green'} text-xl mb-5 group-hover:scale-110 transition-transform">
+                            <i class="fa-solid ${service.icon}"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-white mb-2.5 group-hover:text-${isCyan ? 'cyber-cyan' : 'cyber-green'} transition-colors">${service.title}</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">${service.shortDesc}</p>
+                    </div>
+                    <div class="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-${isCyan ? 'cyber-cyan' : 'cyber-green'}">
+                        <span>Batafsil ko'rish</span>
+                        <i class="fa-solid fa-arrow-up-right-from-square group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"></i>
+                    </div>
+                `;
+                card.addEventListener('click', () => openServiceModal(service));
+                servicesGrid.appendChild(card);
+            });
+
+            function openServiceModal(service) {
+                document.getElementById('modalIcon').innerHTML = `<i class="fa-solid ${service.icon}"></i>`;
+                document.getElementById('modalTitle').textContent = service.title;
+                document.getElementById('modalDesc').textContent = service.fullDesc;
+                
+                const featuresList = document.getElementById('modalFeatures');
+                featuresList.innerHTML = service.features.map(f => `
+                    <li class="flex items-start gap-2">
+                        <i class="fa-solid fa-shield-check text-cyber-green mt-1"></i>
+                        <span>${f}</span>
+                    </li>
+                `).join('');
+
+                modalOrderBtn.onclick = () => {
+                    closeServiceModal();
+                    const selectEl = document.getElementById('serviceType');
+                    for (let opt of selectEl.options) {
+                        if (opt.value.toLowerCase().includes(service.title.split(' ')[0].toLowerCase())) {
+                            selectEl.value = opt.value;
+                            break;
+                        }
+                    }
+                };
+
+                serviceModal.classList.remove('hidden');
+                serviceModal.classList.add('flex');
+            }
+
+            function closeServiceModal() {
+                serviceModal.classList.add('hidden');
+                serviceModal.classList.remove('flex');
+            }
+
+            closeModalBtn.addEventListener('click', closeServiceModal);
+            modalCancelBtn.addEventListener('click', closeServiceModal);
+            serviceModal.addEventListener('click', (e) => {
+                if (e.target === serviceModal) closeServiceModal();
+            });
+
+            // ==========================================
+            // 3. JONLI KIBER-HUJUMLAR MONITORI (TERMINAL)
+            // ==========================================
+            const threatTerminal = document.getElementById('threatTerminal');
+            const blockedCountEl = document.getElementById('blockedCount');
+            const activeThreatsCountEl = document.getElementById('activeThreatsCount');
+            const toggleFeedBtn = document.getElementById('toggleFeedBtn');
+
+            let blockedTotal = 14892;
+            let activeThreats = 318;
+            let isFeedRunning = true;
+
+            const sampleThreats = [
+                { type: "DDoS SYN-Flood", src: "185.220.101.42", target: "api.uz-bank-gateway", status: "BLOKLANDI", color: "text-cyber-cyan" },
+                { type: "Phishing URL", src: "91.132.44.19", target: "mail-filter-node-02", status: "KARANTIN", color: "text-amber-400" },
+                { type: "SQL Injection", src: "45.95.147.88", target: "web-portal-waf", status: "TO'SILDI", color: "text-cyber-green" },
+                { type: "Brute-Force SSH", src: "103.145.12.71", target: "cloud-server-uz-04", status: "IP BAN", color: "text-rose-400" },
+                { type: "Trojan.Win32.Dropper", src: "194.26.135.11", target: "endpoint-shield-19", status: "YO'Q QILINDI", color: "text-cyber-green" },
+                { type: "XSS Payload", src: "77.247.181.163", target: "e-commerce-checkout", status: "BLOKLANDI", color: "text-cyber-cyan" },
+                { type: "Ransomware Beacon", src: "178.175.131.50", target: "soc-honeypot-net", status: "IZOLYATSIYA", color: "text-rose-400" }
+            ];
+
+            function addThreatLog() {
+                if (!isFeedRunning) return;
+
+                const item = sampleThreats[Math.floor(Math.random() * sampleThreats.length)];
+                const now = new Date();
+                const timeStr = now.toTimeString().split(' ')[0];
+
+                const logLine = document.createElement('div');
+                logLine.className = "flex flex-wrap items-center gap-2 py-1 border-b border-slate-900/70 text-[11px] sm:text-xs";
+                logLine.innerHTML = `
+                    <span class="text-slate-500">[${timeStr}]</span>
+                    <span class="px-1.5 py-0.5 rounded bg-slate-900 ${item.color} font-semibold">${item.type}</span>
+                    <span class="text-slate-400">Manba: <span class="text-slate-200">${item.src}</span></span>
+                    <span class="text-slate-500">-></span>
+                    <span class="text-slate-300">${item.target}</span>
+                    <span class="ml-auto px-2 py-0.5 rounded bg-emerald-500/10 text-cyber-green border border-emerald-500/30 font-bold">[${item.status}]</span>
+                `;
+
+                threatTerminal.prepend(logLine);
+                if (threatTerminal.children.length > 25) {
+                    threatTerminal.removeChild(threatTerminal.lastChild);
+                }
+
+                blockedTotal += Math.floor(Math.random() * 3) + 1;
+                blockedCountEl.textContent = blockedTotal.toLocaleString('en-US');
+
+                if (Math.random() > 0.6) {
+                    activeThreats = Math.max(280, activeThreats + (Math.random() > 0.5 ? 1 : -1));
+                    activeThreatsCountEl.textContent = activeThreats;
+                }
+            }
+
+            // Dastlabki 6 ta logni chiqarish
+            for (let i = 0; i < 6; i++) addThreatLog();
+            setInterval(addThreatLog, 2200);
+
+            toggleFeedBtn.addEventListener('click', () => {
+                isFeedRunning = !isFeedRunning;
+                toggleFeedBtn.innerHTML = isFeedRunning 
+                    ? '<i class="fa-solid fa-pause mr-1"></i> Pauza' 
+                    : '<i class="fa-solid fa-play mr-1"></i> Davom ettirish';
+            });
+
+            // ==========================================
+            // 4. PAROL MUSTAHKAMLIGINI TEKSHIRUVCHI VOSITA
+            // ==========================================
+            const passwordInput = document.getElementById('passwordInput');
+            const togglePassVisibility = document.getElementById('togglePassVisibility');
+            const generatePassBtn = document.getElementById('generatePassBtn');
+            const strengthLabel = document.getElementById('strengthLabel');
+            const strengthPercent = document.getElementById('strengthPercent');
+            const strengthBar = document.getElementById('strengthBar');
+            const crackTimeEl = document.getElementById('crackTime');
+            const adviceBox = document.getElementById('passwordAdviceBox');
+
+            const reqLength = document.getElementById('reqLength');
+            const reqUpper = document.getElementById('reqUpper');
+            const reqNumber = document.getElementById('reqNumber');
+            const reqSpecial = document.getElementById('reqSpecial');
+
+            function updateRequirementUI(el, passed) {
+                const icon = el.querySelector('i');
+                if (passed) {
+                    el.classList.remove('text-slate-400');
+                    el.classList.add('text-cyber-green');
+                    icon.className = 'fa-solid fa-circle-check text-cyber-green';
+                } else {
+                    el.classList.remove('text-cyber-green');
+                    el.classList.add('text-slate-400');
+                    icon.className = 'fa-regular fa-circle-xmark text-rose-500';
+                }
+            }
+
+            function analyzePassword(pwd) {
+                if (!pwd) {
+                    strengthLabel.textContent = "Kiritilmagan";
+                    strengthLabel.className = "text-slate-400";
+                    strengthPercent.textContent = "0%";
+                    strengthBar.style.width = "0%";
+                    strengthBar.className = "h-full w-0 rounded-full bg-slate-600 transition-all duration-300";
+                    crackTimeEl.textContent = "—";
+                    [reqLength, reqUpper, reqNumber, reqSpecial].forEach(el => updateRequirementUI(el, false));
+                    return;
+                }
+
+                const hasLength = pwd.length >= 12;
+                const hasUpperAndLower = /[A-Z]/.test(pwd) && /[a-z]/.test(pwd);
+                const hasNumber = /[0-9]/.test(pwd);
+                const hasSpecial = /[^A-Za-z0-9]/.test(pwd);
+
+                updateRequirementUI(reqLength, hasLength);
+                updateRequirementUI(reqUpper, hasUpperAndLower);
+                updateRequirementUI(reqNumber, hasNumber);
+                updateRequirementUI(reqSpecial, hasSpecial);
+
+                // Ball hisoblash
+                let score = 0;
+                score += Math.min(40, pwd.length * 3);
+                if (hasUpperAndLower) score += 20;
+                if (hasNumber) score += 15;
+                if (hasSpecial) score += 25;
+
+                // Oddiy parollar jarimasi
+                const commonPatterns = ['123456', 'password', 'qwerty', 'admin', 'uzbekistan', '111111'];
+                if (commonPatterns.some(p => pwd.toLowerCase().includes(p))) {
+                    score = Math.min(score, 25);
+                }
+
+                score = Math.min(100, Math.max(5, score));
+
+                // Entropiya va taxminiy buzish vaqti
+                let poolSize = 0;
+                if (/[a-z]/.test(pwd)) poolSize += 26;
+                if (/[A-Z]/.test(pwd)) poolSize += 26;
+                if (/[0-9]/.test(pwd)) poolSize += 10;
+                if (/[^A-Za-z0-9]/.test(pwd)) poolSize += 32;
+
+                const combinations = Math.pow(poolSize || 10, pwd.length);
+                // Soniyaiga 100 milliard urinish (zamonaviy GPU klasteri)
+                const seconds = combinations / 1e11;
+
+                let timeText = "";
+                if (seconds < 1) timeText = "Bir necha millisoniya (Juda xavfli!)";
+                else if (seconds < 60) timeText = `${Math.round(seconds)} soniya`;
+                else if (seconds < 3600) timeText = `${Math.round(seconds / 60)} daqiqa`;
+                else if (seconds < 86400) timeText = `${Math.round(seconds / 3600)} soat`;
+                else if (seconds < 31536000) timeText = `${Math.round(seconds / 86400)} kun`;
+                else if (seconds < 31536000 * 1000) timeText = `${Math.round(seconds / 31536000)} yil`;
+                else timeText = "Minglab yillar (Buzib bo'lmaydi)";
+
+                crackTimeEl.textContent = timeText;
+                strengthPercent.textContent = `${score}%`;
+                strengthBar.style.width = `${score}%`;
+
+                if (score < 40) {
+                    strengthLabel.textContent = "Juda zaif";
+                    strengthLabel.className = "text-rose-500";
+                    strengthBar.className = "h-full rounded-full bg-rose-500 transition-all duration-300";
+                    adviceBox.textContent = "Ogohlantirish: Bu parolni avtomatlashtirilgan dasturlar bir necha soniyada buzishi mumkin!";
+                } else if (score < 70) {
+                    strengthLabel.textContent = "O'rtacha";
+                    strengthLabel.className = "text-amber-400";
+                    strengthBar.className = "h-full rounded-full bg-amber-400 transition-all duration-300";
+                    adviceBox.textContent = "Yaxshi boshlanish, lekin uzunligini 12+ belgiga yetkazing va maxsus belgilar qo'shing.";
+                } else if (score < 90) {
+                    strengthLabel.textContent = "Kuchli";
+                    strengthLabel.className = "text-cyber-cyan";
+                    strengthBar.className = "h-full rounded-full bg-cyber-cyan transition-all duration-300";
+                    adviceBox.textContent = "Ajoyib parol! Ko'pchilik kiber-hujumlarga yetarlicha bardosh bera oladi.";
+                } else {
+                    strengthLabel.textContent = "Mukammal (Kiber-qalqon)";
+                    strengthLabel.className = "text-cyber-green";
+                    strengthBar.className = "h-full rounded-full bg-gradient-to-r from-cyber-cyan to-cyber-green transition-all duration-300";
+                    adviceBox.textContent = "Tabriklaymiz! Bu parol harbiy darajadagi mustahkamlikka ega.";
+                }
+            }
+
+            passwordInput.addEventListener('input', (e) => analyzePassword(e.target.value));
+
+            togglePassVisibility.addEventListener('click', () => {
+                const isPwd = passwordInput.type === 'password';
+                passwordInput.type = isPwd ? 'text' : 'password';
+                togglePassVisibility.innerHTML = isPwd 
+                    ? '<i class="fa-solid fa-eye-slash"></i>' 
+                    : '<i class="fa-solid fa-eye"></i>';
+            });
+
+            generatePassBtn.addEventListener('click', () => {
+                const chars = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%^&*_-+=";
+                let generated = "";
+                const array = new Uint32Array(16);
+                window.crypto.getRandomValues(array);
+                for (let i = 0; i < 16; i++) {
+                    generated += chars[array[i] % chars.length];
+                }
+                passwordInput.type = 'text';
+                togglePassVisibility.innerHTML = '<i class="fa-solid fa-eye-slash"></i>';
+                passwordInput.value = generated;
+                analyzePassword(generated);
+            });
+
+            // ==========================================
+            // 5. KIBERXAVFSIZLIK BO'YICHA TEZKOR TEST (QUIZ)
+            // ==========================================
+            const quizQuestions = [
+                {
+                    question: "1. Elektron pochtangizga bank nomidan 'Hisobingiz bloklandi, darhol havolaga o'tib parolni tasdiqlang' degan xat keldi. Nima qilasiz?",
+                    options: [
+                        "Darhol havolaga bosib, login va parolimni kiritaman",
+                        "Xat yuboruvchi manzilini tekshiraman va bankning rasmiy ilovasi orqali bog'lanaman",
+                        "Xatni do'stlarimga ham yuborib, ularni ogohlantiraman"
+                    ],
+                    correct: 1,
+                    explanation: "To'g'ri! Bu klassik Phishing hujumi. Hech qachon shubhali havolalar orqali parol kiritmang."
+                },
+                {
+                    question: "2. Jamoat joylaridagi (kafe, aeroport) parolsiz bepul Wi-Fi tarmoqlaridan foydalanganda nima xavfli?",
+                    options: [
+                        "Telefon batareyasi tezroq tugaydi",
+                        "Xakerlar 'Man-in-the-Middle' hujumi orqali internet trafigingizni tinglashi mumkin",
+                        "Wi-Fi signali kompyuterni sekinlashtiradi"
+                    ],
+                    correct: 1,
+                    explanation: "To'g'ri! Ochiq Wi-Fi tarmoqlarida bank ilovalariga kirmang yoki ishonchli VPN dan foydalaning."
+                },
+                {
+                    question: "3. Hisoblaringizni himoyalash uchun 2FA (ikki bosqichli autentifikatsiya)ning eng ishonchli usuli qaysi?",
+                    options: [
+                        "Maxsus Authenticator ilovasi (Google/Microsoft Authenticator) yoki apparat kaliti",
+                        "Barcha saytlar uchun bitta murakkab parol ishlatish",
+                        "Parolni brauzer xotirasida saqlash"
+                    ],
+                    correct: 0,
+                    explanation: "Ajoyib! Authenticator ilovalari SIM-karta almashtirish (SIM-swapping) hujumlaridan ham himoyalaydi."
+                },
+                {
+                    question: "4. Ransomware (tovlamachi virus) hujumidan keyin ma'lumotlarni pul to'lamasdan tiklashning eng samarali yo'li nima?",
+                    options: [
+                        "Kompyuterni qayta yuklash (Restart)",
+                        "Tarmoqdan uzilgan (offline) zaxira nusxalardan (Backup) ma'lumotlarni tiklash",
+                        "Antivirus dasturini o'chirib yoqish"
+                    ],
+                    correct: 1,
+                    explanation: "To'g'ri! Muntazam olingan zaxira nusxalar (3-2-1 qoidasi) Ransomware ga qarshi eng kuchli quroldir."
+                },
+                {
+                    question: "5. Veb-sayt manzili boshidagi 'HTTPS://' va qulf belgisi nimani anglatadi?",
+                    options: [
+                        "Saytda hech qanday virus yo'qligini 100% kafolatlaydi",
+                        "Brauzeringiz va server o'rtasidagi ma'lumotlar shifrlangan holda uzatilishini",
+                        "Sayt davlat tomonidan ro'yxatdan o'tganligini"
+                    ],
+                    correct: 1,
+                    explanation: "To'g'ri! HTTPS aloqa kanalini shifrlaydi, ammo firibgar saytlarda ham HTTPS bo'lishi mumkinligini unutmang."
+                }
+            ];
+
+            let currentQuizIdx = 0;
+            let quizScore = 0;
+            let answeredCurrent = false;
+
+            const quizStepBadge = document.getElementById('quizStepBadge');
+            const quizQuestionEl = document.getElementById('quizQuestion');
+            const quizOptionsEl = document.getElementById('quizOptions');
+            const quizFeedback = document.getElementById('quizFeedback');
+            const nextQuizBtn = document.getElementById('nextQuizBtn');
+            const quizContainer = document.getElementById('quizContainer');
+            const quizResultContainer = document.getElementById('quizResultContainer');
+            const quizFooter = document.getElementById('quizFooter');
+            const restartQuizBtn = document.getElementById('restartQuizBtn');
+
+            function renderQuizQuestion() {
+                answeredCurrent = false;
+                nextQuizBtn.disabled = true;
+                const q = quizQuestions[currentQuizIdx];
+                quizStepBadge.textContent = `${currentQuizIdx + 1} / ${quizQuestions.length}`;
+                quizQuestionEl.textContent = q.question;
+                quizFeedback.textContent = "Javob variantlaridan birini tanlang";
+                quizFeedback.className = "text-xs text-slate-400";
+
+                quizOptionsEl.innerHTML = '';
+                q.options.forEach((optText, idx) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = "w-full text-left p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 hover:border-cyber-cyan/60 text-xs sm:text-sm text-slate-200 transition-all flex items-center gap-3";
+                    btn.innerHTML = `
+                        <span class="w-6 h-6 rounded-lg bg-slate-800 text-cyber-cyan font-mono text-xs flex items-center justify-center shrink-0">${String.fromCharCode(65 + idx)}</span>
+                        <span>${optText}</span>
+                    `;
+                    btn.addEventListener('click', () => handleQuizAnswer(idx, btn));
+                    quizOptionsEl.appendChild(btn);
+                });
+
+                nextQuizBtn.innerHTML = currentQuizIdx === quizQuestions.length - 1 
+                    ? 'Natijani ko\'rish <i class="fa-solid fa-flag-checkered ml-1"></i>' 
+                    : 'Keyingi savol <i class="fa-solid fa-arrow-right ml-1"></i>';
+            }
+
+            function handleQuizAnswer(selectedIdx, selectedBtn) {
+                if (answeredCurrent) return;
+                answeredCurrent = true;
+                nextQuizBtn.disabled = false;
+
+                const q = quizQuestions[currentQuizIdx];
+                const allButtons = quizOptionsEl.querySelectorAll('button');
+
+                allButtons.forEach((btn, idx) => {
+                    btn.disabled = true;
+                    if (idx === q.correct) {
+                        btn.classList.remove('border-slate-800');
+                        btn.classList.add('border-cyber-green', 'bg-cyber-green/10', 'text-white');
+                    } else if (idx === selectedIdx && selectedIdx !== q.correct) {
+                        btn.classList.remove('border-slate-800');
+                        btn.classList.add('border-rose-500', 'bg-rose-500/10', 'text-rose-200');
+                    }
+                });
+
+                if (selectedIdx === q.correct) {
+                    quizScore++;
+                    quizFeedback.textContent = q.explanation;
+                    quizFeedback.className = "text-xs text-cyber-green";
+                } else {
+                    quizFeedback.textContent = "Noto'g'ri. " + q.explanation;
+                    quizFeedback.className = "text-xs text-rose-400";
+                }
+            }
+
+            nextQuizBtn.addEventListener('click', () => {
+                if (currentQuizIdx < quizQuestions.length - 1) {
+                    currentQuizIdx++;
+                    renderQuizQuestion();
+                } else {
+                    showQuizResult();
+                }
+            });
+
+            function showQuizResult() {
+                quizContainer.classList.add('hidden');
+                quizFooter.classList.add('hidden');
+                quizResultContainer.classList.remove('hidden');
+
+                document.getElementById('quizScoreText').textContent = `${quizScore}/${quizQuestions.length}`;
+                const titleEl = document.getElementById('quizResultTitle');
+                const adviceEl = document.getElementById('quizResultAdvice');
+
+                if (quizScore === 5) {
+                    titleEl.textContent = "Mukammal Natija — Kiber-Ekspert!";
+                    adviceEl.textContent = "Siz kiberxavfsizlik qoidalarini a'lo darajada bilasiz. Raqamli makonda o'zingizni va jamoangizni ishonchli himoya qila olasiz.";
+                } else if (quizScore >= 3) {
+                    titleEl.textContent = "Yaxshi Natija!";
+                    adviceEl.textContent = "Asosiy xavfsizlik ko'nikmalariga egasiz, biroq Phishing va 2FA bo'yicha bilimlar bazamizdagi maqolalarni ko'zdan kechirishni tavsiya qilamiz.";
+                } else {
+                    titleEl.textContent = "Ehtiyot Bo'ling — Kiber-Xavf Yuqori!";
+                    adviceEl.textContent = "Raqamli firibgarlar tuzog'iga tushib qolish ehtimolingiz yuqori. Barcha akkauntlaringizda 2FA ni yoqing va parollaringizni yangilang.";
+                }
+            }
+
+            restartQuizBtn.addEventListener('click', () => {
+                currentQuizIdx = 0;
+                quizScore = 0;
+                quizContainer.classList.remove('hidden');
+                quizFooter.classList.remove('hidden');
+                quizResultContainer.classList.add('hidden');
+                renderQuizQuestion();
+            });
+
+            renderQuizQuestion();
+
+            // ==========================================
+            // 6. AUDIT BUYURTMA QILISH FORMASI
+            // ==========================================
+            const auditForm = document.getElementById('auditForm');
+            const auditSuccessBox = document.getElementById('auditSuccessBox');
+            const auditConfirmationText = document.getElementById('auditConfirmationText');
+            const ticketNumberEl = document.getElementById('ticketNumber');
+            const newRequestBtn = document.getElementById('newRequestBtn');
+
+            auditForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const name = document.getElementById('fullName').value.trim();
+                const target = document.getElementById('companyOrSite').value.trim();
+                const service = document.getElementById('serviceType').value;
+
+                const randomTicket = `#KQ-${Math.floor(1000 + Math.random() * 9000)}`;
+                ticketNumberEl.textContent = randomTicket;
+                auditConfirmationText.innerHTML = `Hurmatli <strong class="text-white">${name}</strong>, <span class="text-cyber-cyan font-mono">${target}</span> uchun <strong class="text-cyber-green">${service}</strong> bo'yicha arizangiz qabul qilindi. Kiber-muhandislarimiz tez orada bog'lanishadi.`;
+
+                auditForm.classList.add('hidden');
+                auditSuccessBox.classList.remove('hidden');
+            });
+
+            newRequestBtn.addEventListener('click', () => {
+                auditForm.reset();
+                auditSuccessBox.classList.add('hidden');
+                auditForm.classList.remove('hidden');
+            });
+
+            // ==========================================
+            // 7. ORQA FONDAGI INTERAKTIV KIBER-TARMOQ ANIMATSIYASI
+            // ==========================================
+            const canvas = document.getElementById('networkCanvas');
+            const ctx = canvas.getContext('2d');
+            let particles = [];
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
+
+            class Particle {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = (Math.random() - 0.5) * 0.6;
+                    this.vy = (Math.random() - 0.5) * 0.6;
+                    this.radius = Math.random() * 1.8 + 0.8;
+                    this.isGreen = Math.random() > 0.75;
+                }
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+                    if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                    if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+                }
+                draw() {
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = this.isGreen ? '#00ff88' : '#00f0ff';
+                    ctx.fill();
+                }
+            }
+
+            function initParticles() {
+                particles = [];
+                const count = Math.min(75, Math.floor((canvas.width * canvas.height) / 18000));
+                for (let i = 0; i < count; i++) {
+                    particles.push(new Particle());
+                }
+            }
+            initParticles();
+
+            function animateNetwork() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                for (let i = 0; i < particles.length; i++) {
+                    particles[i].update();
+                    particles[i].draw();
+
+                    for (let j = i + 1; j < particles.length; j++) {
+                        const dx = particles[i].x - particles[j].x;
+                        const dy = particles[i].y - particles[j].y;
+                        const dist = Math.sqrt(dx * dx + dy * dy);
+
+                        if (dist < 140) {
+                            ctx.beginPath();
+                            ctx.strokeStyle = `rgba(0, 240, 255, ${(1 - dist / 140) * 0.22})`;
+                            ctx.lineWidth = 0.8;
+                            ctx.moveTo(particles[i].x, particles[i].y);
+                            ctx.lineTo(particles[j].x, particles[j].y);
+                            ctx.stroke();
+                        }
+                    }
+                }
+                requestAnimationFrame(animateNetwork);
+            }
+            animateNetwork();
+        });
+    </script>
+</body>
+</html>
